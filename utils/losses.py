@@ -12,3 +12,4 @@ def mse_loss(pred, target):
 
 def l1_loss(pred, target):
   return nn.L1Loss()(pred, target)
+

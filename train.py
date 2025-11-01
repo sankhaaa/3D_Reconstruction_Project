@@ -89,4 +89,4 @@ if __name__ == "__main__":
     train()
 model = UNet3D().to("cpu")
 torch.save(model.state_dict(), "checkpoints/model_final.pth")
-
+ 

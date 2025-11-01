@@ -15,3 +15,4 @@ def psnr(pred, target, max_val=1.0):
 
 def mae(pred, target):
   return torch.mean(torch.abs(pred - target)).item()
+ 
