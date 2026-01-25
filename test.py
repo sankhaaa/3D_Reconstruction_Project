@@ -26,4 +26,4 @@ with torch.no_grad():
         save_nifti(out_np, os.path.join(output_folder, "recon_" + f),reference_path=vol)
         print(f"✅ Reconstructed {f}")
 
-print("🏁 All reconstructions complete!")
+print(" All reconstructions complete!")
