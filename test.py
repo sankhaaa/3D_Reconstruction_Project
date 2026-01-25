@@ -24,6 +24,6 @@ with torch.no_grad():
         out = model(inp)
         out_np = out.squeeze().cpu().numpy()
         save_nifti(out_np, os.path.join(output_folder, "recon_" + f),reference_path=vol)
-        print(f"✅ Reconstructed {f}")
+        print(f" Reconstructed {f}")
 
 print(" All reconstructions complete!")
