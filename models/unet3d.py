@@ -1,7 +1,3 @@
-"""Simple, well-tested 3D U-Net implementation.
-Designed to be readable and reasonably memory-efficient.
-"""
-
 
 import torch
 import torch.nn as nn
@@ -44,14 +40,14 @@ class Down(nn.Module):
 class Up(nn.Module):
   def __init__(self, in_ch, out_ch):
     super().__init__()
-    # use ConvTranspose for upsampling
+    # convtranspose for upsampling
     self.up = nn.ConvTranspose3d(in_ch, out_ch, kernel_size=2, stride=2)
     self.conv = DoubleConv(in_ch, out_ch)
     
   
   def forward(self, x1, x2):
     x1 = self.up(x1)
-    # pad if necessary
+    
     diffZ = x2.size(2) - x1.size(2)
     diffY = x2.size(3) - x1.size(3)
     diffX = x2.size(4) - x1.size(4)
@@ -101,7 +97,7 @@ class UNet3D(nn.Module):
 
 
 if __name__ == "__main__":
-    # quick smoke test
+    
     m = UNet3D(in_channels=1, out_channels=1, base_filters=8)
     x = torch.randn(1, 1, 64, 128, 128)
     y = m(x)
