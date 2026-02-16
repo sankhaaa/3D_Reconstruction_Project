@@ -16,7 +16,7 @@ from tqdm import tqdm
 from data.dataset import MRIReconstructionDataset  # (your dataset file)
 from models.unet3d import UNet3D  # your 3D reconstruction model
 
-from utils.metrics import psnr
+from utils.metrics import psnr, mae, ssim_3d
 
 val_dataset = MRIReconstructionDataset("data/val")
 
@@ -32,16 +32,20 @@ val_loader = DataLoader(
 def validate(model, val_loader, device):
     model.eval()          # evaluation mode
     total_psnr = 0.0
+    val_mae  = 0.0
+    val_ssim = 0.0
 
     with torch.no_grad(): # no gradients
         for inputs, targets in val_loader:
             inputs = inputs.to(device)
             targets = targets.to(device)
-
             outputs = model(inputs)
-            total_psnr += psnr(outputs, targets)
 
-    return total_psnr / len(val_loader)
+            total_psnr += psnr(outputs, targets)
+            val_mae  += mae(outputs, targets)
+            val_ssim += ssim_3d(outputs, targets)
+
+    return total_psnr / len(val_loader), val_mae / len(val_loader), val_ssim / len(val_loader)
 
 
 def set_seed(seed: int = 42):
@@ -75,6 +79,8 @@ def train():
         model.train()
         total_loss = 0.0
         train_psnr=0.0
+        train_mae  = 0.0
+        train_ssim = 0.0
 
         for i, (inputs, targets) in enumerate(train_loader):
             print(f" Batch {i+1}/{len(train_loader)}")
@@ -88,9 +94,13 @@ def train():
             total_loss += loss.item()
             with torch.no_grad():
               train_psnr += psnr(outputs, targets)
+              train_mae  += mae(outputs, targets)
+              train_ssim += ssim_3d(outputs, targets)
 
         avg_loss = total_loss / len(train_loader)
         avg_train_psnr = train_psnr / len(train_loader)
+        avg_mae   = train_mae / len(train_loader)
+        avg_ssim  = train_ssim / len(train_loader)
 
         print(f" Epoch {epoch+1} finished | Avg Loss: {total_loss/len(train_loader):.6f}")
 
@@ -98,12 +108,14 @@ def train():
         torch.cuda.empty_cache()
         gc.collect()
 
-        val_psnr = validate(model, val_loader, device)
+        val_psnr, val_mae, val_ssim = validate(model, val_loader, device)
         print(
             f"Epoch {epoch+1} | "
             f"Loss: {avg_loss:.6f} | "
             f"Train PSNR: {avg_train_psnr:.2f} | "
             f"Val PSNR: {val_psnr:.2f}"
+            f"MAE: {avg_mae:.6f} | "
+            f"SSIM: {avg_ssim:.4f}"
         )
     print(" Training complete!")
 
