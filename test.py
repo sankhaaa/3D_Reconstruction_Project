@@ -3,7 +3,7 @@ from models.unet3d import UNet3D
 from data.dataset import load_nifti, save_nifti
 import os
 from utils.metrics import psnr,ssim_3d,mae,dice_score
-
+from utils.losses import mse_loss
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 model = UNet3D()
 model.load_state_dict(torch.load("checkpoints/model_final.pth", map_location=device))
@@ -24,7 +24,7 @@ with torch.no_grad():
         inp = torch.from_numpy(vol).unsqueeze(0).unsqueeze(0).to(device)
         out = model(inp)
 
-        mse_val  = mse(out, inp)
+        mse_val  = mse_loss(out, inp)
         mae_val  = mae(out, inp)
         psnr_val = psnr(out, inp)
         ssim_val = ssim_3d(out, inp)
@@ -38,7 +38,6 @@ with torch.no_grad():
             f"MAE: {mae_val.item():.6f} | "
             f"PSNR: {psnr_val.item():.2f} | "
             f"SSIM: {ssim_val.item():.4f} | "
-            f"Dice: {dice_val.item():.4f}"
         )
 
 print(" All reconstructions complete!")
