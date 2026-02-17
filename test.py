@@ -34,8 +34,8 @@ with torch.no_grad():
         print(f" Reconstructed {f}")
         print(
             f"{f} | "
-            f"MSE: {mse_val.item():.6f} | "
-            f"MAE: {mae_val.item():.6f} | "
+            f"MSE: {mse_val} | "
+            f"MAE: {mae_val} | "
             f"PSNR: {psnr_val.item():.2f} | "
             f"SSIM: {ssim_val.item():.4f} | "
         )
